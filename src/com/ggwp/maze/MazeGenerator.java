@@ -1,6 +1,11 @@
 package com.ggwp.maze;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.Stack;
+
+import android.util.Log;
 
 
 public class MazeGenerator {
@@ -14,6 +19,18 @@ public class MazeGenerator {
 	public int dest_row;
 	public int dest_col;
 	int max_distance;
+	
+	private class Cell {
+		int row;
+		int col;
+		int dist;
+		Cell(int x,int y,int d) {
+			this.row = x;
+			this.col = y;
+			this.dist = d;
+		}
+		
+	}
 	
 	MazeGenerator() {
 		
@@ -69,6 +86,10 @@ public class MazeGenerator {
 		
 	}
 	
+	/*
+	 * RECURSION 
+	 */
+	/*
 	public void create_maze(int row,int column,int distance) {
 		
 		visited[row][column] = true;
@@ -147,6 +168,133 @@ public class MazeGenerator {
 				
 		}
 	}
+	*/
+	
+	/*
+	 * ITERATION
+	 */
+	public void creatMaze() {
+		//Log.d("mazeCreation","start");
+		
+		Stack<Cell> stack = new Stack<Cell>();
+		stack.push(new Cell(0,0,0));
+		int cells = 0;
+		int distance = 0;
+		int n = 0;
+		int blockLength = 5;
+		boolean generateRandom = true;
+		int breakLoop = 0,row,column;
+		Random rand = new Random();
+		int direction[] = new int[4];
+		direction[0] = direction[1] = direction[2] = direction[3] = 0;
+		
+		//Log.d("rowsxcolumns",rows+"x"+columns);
+		
+		while(cells != rows*columns) {
+			
+			Cell current = stack.peek();
+			row = current.row;
+			column = current.col;
+			distance = current.dist;
+			
+			//Log.d("row,col distance",row+","+column+" "+distance);
+			
+			if(distance > max_distance) {
+				dest_row = row;
+				dest_col = column;
+				max_distance = distance;
+			}
+				
+			this.visited[current.row][current.col] = true;
+			
+			if(CheckForDeadEnd(row, column)) {
+				stack.pop();
+				cells++;
+				continue;
+			}
+			
+			generateRandom = true;
+			breakLoop = 0;
+			while(true) {
+				
+				if(generateRandom){
+					
+						n = rand.nextInt(4);
+						breakLoop++;
+						
+					}
+					if(n == 0 && direction[0] < blockLength) {
+						
+						if(!Visited(row-1,column)) {
+							walls[row][column][0] = false;
+							walls[row-1][column][2] = false;
+							direction[0]++;
+							direction[1] = direction[2] = direction[3] = 0;
+							stack.push(new Cell(row-1,column,distance+1));
+							break;
+						}
+						
+					}
+					else if(n == 1 && direction[1] < blockLength) {
+						
+						if(!Visited(row,column+1)){	
+							walls[row][column][1] = false;
+							walls[row][column+1][3] = false;
+							direction[1]++;
+							direction[0] = direction[2] = direction[3] = 0;
+							stack.push(new Cell(row,column+1,distance+1));
+							break;
+						}
+						
+					}
+					else if(n == 2 && direction[2] < blockLength) {
+						
+						if(!Visited(row+1,column)){
+							walls[row][column][2] = false;
+							walls[row+1][column][0] = false;
+							direction[2]++;
+							direction[1] = direction[0] = direction[3] = 0;
+							stack.push(new Cell(row+1,column,distance+1));
+							break;
+						}
+						
+					}
+					else if(n == 3 && direction[3] < blockLength){
+						
+						if(!Visited(row,column-1)){
+							walls[row][column][3] = false;
+							walls[row][column-1][1] = false;
+							direction[3]++;
+							direction[1] = direction[2] = direction[0] = 0;
+							stack.push(new Cell(row,column-1,distance+1));
+							break;
+						}
+						
+					}
+					
+					if(breakLoop == 10) {
+						
+						generateRandom = false;
+						direction[0] = direction[1] = direction[2] = direction[3] = 0;
+						if(!Visited(row-1,column))
+							n = 0;
+						else if(!Visited(row,column+1))
+							n = 1;
+						else if(!Visited(row+1,column))
+							n = 2;
+						else if(!Visited(row,column-1))
+							n = 3;
+						else 
+							break;
+					}
+			}
+				
+			
+			
+		}
+		//Log.d("mazeCreation","done");
+		
+	}
 
 	private boolean CheckForDeadEnd(int row, int column) {
 		
@@ -163,6 +311,6 @@ public class MazeGenerator {
 		
 		return visited[row][column];
 	}
-	
+
 
 }

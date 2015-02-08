@@ -16,6 +16,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Environment;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -95,17 +96,24 @@ public class GameView extends View {
 		mazeX = new int[rows][columns];
 		mazeY = new int[rows][columns];
 		mazeColor = new boolean[rows][columns];
+		Log.d("rowsxcolumns",rows+"x"+columns);
 		mazeGenerator = new MazeGenerator(rows,columns);
+		
+		//mazeGenerator.create_maze(0, 0,0);
+		mazeGenerator.creatMaze();
+//		if(cell_size<60)
+//			mazeGenerator.openWalls(cell_size);
+		createMazeCoordinates();
+		
 		
 		moveCount = (int) Math.min(mazeGenerator.max_distance+(0.1*mazeGenerator.max_distance),rows*columns);
 		moves.setText("Moves Left : "+moveCount);
-		createMazeCoordinates();
 		detector = new ScaleGestureDetector(context, new ScaleListener());
 		
 	}
 	
 	//assign coordinates of top left corner of each cell
-	private void createMazeCoordinates() {
+	public void createMazeCoordinates() {
 		
 		int start_x = (width - columns*cell_size)/2; 
 		int x = start_x; //starting x coord top left
@@ -133,6 +141,8 @@ public class GameView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+		
+		
 		
 		canvas.save();
 		canvas.scale(scaleFactor, scaleFactor);//,this.detector.getFocusX(),this.detector.getFocusY());

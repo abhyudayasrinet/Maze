@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class GameActivity extends Activity {
 	
@@ -124,12 +126,9 @@ public class GameActivity extends Activity {
         mainLayout.addView(view);
         setContentView(mainLayout);
         
-        
-        
-        
+     
+	
+	
+	
 	}
-	
-	
-	
-
 }
