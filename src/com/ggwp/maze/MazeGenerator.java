@@ -13,6 +13,7 @@ public class MazeGenerator {
 	
 	public boolean visited[][];
 	public boolean walls[][][];
+	public boolean marked[][];
 	int distance[][];
 	int rows;
 	int columns;
@@ -44,6 +45,7 @@ public class MazeGenerator {
 		visited = new boolean[rows][columns];
 		walls = new boolean[rows][columns][4];
 		distance = new int[rows][columns];
+		marked = new boolean[rows][columns];
 		max_distance = 0;
 		setValues();
 	}
@@ -181,7 +183,7 @@ public class MazeGenerator {
 		int cells = 0;
 		int distance = 0;
 		int n = 0;
-		int blockLength = 5;
+		int blockLength = 3;
 		boolean generateRandom = true;
 		int breakLoop = 0,row,column;
 		Random rand = new Random();
@@ -205,14 +207,81 @@ public class MazeGenerator {
 				max_distance = distance;
 			}
 				
-			this.visited[current.row][current.col] = true;
 			
-			if(CheckForDeadEnd(row, column)) {
+			
+			/*if(CheckForDeadEnd(row, column) && !visited[row][column]) {
+				
+				Log.d("marked dead end",row+","+column);
+				if(!marked[row][column]) {
+					
+					
+					if(row == 0) {
+						walls[row][column][2] = false;
+						walls[row+1][column][0] = false;
+					}
+					else if(column == 0) {
+						walls[row][column][1] = false;
+						walls[row][column+1][3] = false;
+					}
+					else if(row == rows - 1) {
+						walls[row][column][0] = false;
+						walls[row-1][column][2] = false;
+					}
+					else if(column == columns - 1) {
+						walls[row][column][3] = false;
+						walls[row][column-1][1] = false;
+					}
+					else {
+						Log.d("row,column",row+","+column);
+						List<Integer> temp = new ArrayList<Integer>();
+						for(int i=0;i<4;i++)
+							if(walls[row][column][i])
+							{
+								temp.add(i);
+								Log.d("i",i+"");
+							}
+						Log.d("temp.size",temp.size()+"");
+						if(temp.size() > 0)
+						{
+							int choice = rand.nextInt(temp.size());
+							if(temp.get(choice) == 0) {
+								walls[row][column][0] = false;
+								walls[row-1][column][2] = false;
+							}
+							else if(temp.get(choice) == 1) {
+								walls[row][column][1] = false;
+								walls[row][column+1][3] = false;
+							}
+							else if(temp.get(choice) == 2) {
+								walls[row][column][2] = false;
+								walls[row+1][column][0] = false;
+							}
+							else if(temp.get(choice) == 3) {
+								walls[row][column][3] = false;
+								walls[row][column-1][1] = false;
+							}
+						}
+					}
+					
+					marked[row][column]  = true;
+				}
+				this.visited[current.row][current.col] = true;
 				stack.pop();
 				cells++;
 				continue;
+				
+			}
+			else */if(CheckForDeadEnd(row, column)) {
+				
+				this.visited[current.row][current.col] = true;
+				Log.d("dead end",row+","+column);
+				stack.pop();
+				cells++;
+				continue;
+				
 			}
 			
+			this.visited[current.row][current.col] = true;
 			generateRandom = true;
 			breakLoop = 0;
 			while(true) {

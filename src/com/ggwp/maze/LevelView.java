@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -64,6 +66,11 @@ public class LevelView extends View {
 	
 	private boolean screenTouched = false;
 	
+	final Handler longPressHandler;
+	Runnable longPressRunnable;
+	boolean longPressed;
+	
+	
 	//same as gameview except mazegenerator recieves object queried from database
 	public LevelView(Context context,int height,int width,TextView moves,int level) {
 		super(context);
@@ -92,6 +99,13 @@ public class LevelView extends View {
 		createMazeCoordinates();
 		detector = new ScaleGestureDetector(context, new ScaleListener());
 		
+		longPressHandler = new Handler();
+		longPressRunnable = new Runnable() {
+			@Override
+			public void run() {
+				longPressed = true;
+			}
+		};
 		
 		
 	}
@@ -195,8 +209,9 @@ public class LevelView extends View {
 			startY = event.getY() - previousTranslateY;
 			screenTouched = true;
 			//logCell(event.getX(),event.getY());
-			markCell(event.getX(),event.getY());           
-
+			markCell(event.getX(),event.getY());          
+			if(!longPressed)
+				longPressHandler.postDelayed(longPressRunnable, 500);
             break;
 		
 			
@@ -204,6 +219,14 @@ public class LevelView extends View {
 			//This event fires when the finger moves across the screen, although in practice I've noticed that
             //this fires even when you're simply holding the finger on the screen.
 			mode = DRAG;
+			
+			if(longPressed) {
+				markCell(event.getX(),event.getY());
+            	dragged = true;
+            	break;
+			}
+			
+			
 			translateX = event.getX() - startX;
 			translateY = event.getY() - startY;
 			
@@ -238,6 +261,7 @@ public class LevelView extends View {
 		case MotionEvent.ACTION_UP:
 			//This event fires when all fingers are off the screen
 			mode = NONE;
+			longPressed = false;
 			dragged = false;
 			screenTouched = false;
 			previousTranslateX = translateX;

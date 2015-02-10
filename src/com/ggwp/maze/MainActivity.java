@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -109,6 +110,17 @@ public class MainActivity extends Activity {
 			}
 		});
         
+        ImageButton help = (ImageButton) findViewById(R.id.help);
+        help.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				Intent intent = new Intent(getApplicationContext(),Tutorial.class);
+				startActivity(intent);
+				
+			}
+		});
       
         
     	

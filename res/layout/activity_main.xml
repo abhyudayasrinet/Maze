@@ -4,7 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 	android:background="@drawable/maze"
-    tools:context="${relativePackage}.${activityClass}" >
+    tools:context="${relativePackage}.${activityClass}"
+    android:paddingTop="8dp" 
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
+    
 
     <Button
         android:id="@+id/normalGame"
@@ -62,5 +66,19 @@
         android:text="QUICK GAME"
         android:textColor="#000000"
         android:textSize="20sp" />
+
+    <ImageButton
+        android:id="@+id/help"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/help_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:padding="8dp"
+        android:src="@android:drawable/ic_menu_help" />
 
 </RelativeLayout>

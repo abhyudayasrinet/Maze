@@ -16,6 +16,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -74,6 +75,9 @@ public class GameView extends View {
 	
 	private boolean screenTouched = false;
 	
+	final Handler longPressHandler;
+	Runnable longPressRunnable;
+	boolean longPressed;
 	
 	public GameView(Context context,int height,int width,TextView moves,
 			int cell_size) {
@@ -84,6 +88,15 @@ public class GameView extends View {
 		this.width = width;
 		this.moves = moves;
 		this.cell_size = cell_size;
+		longPressHandler = new Handler();
+		longPressRunnable = new Runnable() {
+			@Override
+			public void run() {
+				longPressed = true;
+			}
+		};
+		
+		
 		DB = new LevelsDB(context);	
 		
 		rows = (height/cell_size)-1;
@@ -213,8 +226,9 @@ public class GameView extends View {
 			startX = event.getX() - previousTranslateX;
 			startY = event.getY() - previousTranslateY;
 			screenTouched = true;
-			markCell(event.getX(),event.getY());           
-
+			markCell(event.getX(),event.getY()); 
+			if(!longPressed)
+				longPressHandler.postDelayed(longPressRunnable, 500);
             break;
 		
 			
@@ -222,6 +236,13 @@ public class GameView extends View {
 			//This event fires when the finger moves across the screen, although in practice I've noticed that
             //this fires even when you're simply holding the finger on the screen.
 			mode = DRAG;
+			
+			if(longPressed) {
+				markCell(event.getX(),event.getY());
+            	dragged = true;
+            	break;
+			}
+			
 			translateX = event.getX() - startX;
 			translateY = event.getY() - startY;
 			
@@ -237,7 +258,8 @@ public class GameView extends View {
 			
 			//if distance of dragging is > 100 only then assume user wants to pan 
 			//else leave it be
-            if(distance > 100) {
+			
+			if(distance > 100) {
                dragged = true;
             }    
             else {
@@ -255,8 +277,11 @@ public class GameView extends View {
 		case MotionEvent.ACTION_UP:
 			//This event fires when all fingers are off the screen
 			mode = NONE;
+			longPressed = false;
+			Log.d("longPressed","false");
 			dragged = false;
 			screenTouched = false;
+			longPressHandler.removeCallbacks(longPressRunnable);
 			previousTranslateX = translateX;
             previousTranslateY = translateY;
             
@@ -274,10 +299,10 @@ public class GameView extends View {
 		
 		detector.onTouchEvent(event);
 		
-		if ((mode == DRAG && scaleFactor != 1f && dragged) || screenTouched) { 
-			
+		if ( (mode == DRAG && scaleFactor != 1f && dragged) || screenTouched) { 
+//			Log.d("invalidate","started");
 			invalidate();
-			
+//			Log.d("invalidate","done");
 		}
 		return true;
 	}
@@ -297,7 +322,7 @@ public class GameView extends View {
 				if(x > mazeX[i][j] && x < mazeX[i][j]+cell_size &&
 					y > mazeY[i][j] && y < mazeY[i][j]+cell_size && neighbourVisited(i,j) &&
 					!mazeColor[i][j]) {
-					
+						
 						row_number = i;
 						column_number = j;
 						
@@ -377,5 +402,7 @@ public class GameView extends View {
 		}
 		
 	}
+	
+	
 
 }

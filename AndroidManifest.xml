@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ggwp.maze"
-    android:versionCode="1"
-    android:versionName="1.0.1" >
+    android:versionCode="4"
+    android:versionName="1.0.3" >
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -46,6 +46,11 @@
             android:name="com.ggwp.maze.RecordsList"
             android:screenOrientation="portrait"
             android:label="Records list view ">
+        </activity>
+        <activity
+            android:name="com.ggwp.maze.Tutorial"
+            android:screenOrientation="portrait"
+            android:label="Tutorial ">
         </activity>
         
         <activity android:name="com.google.android.gms.ads.AdActivity"
