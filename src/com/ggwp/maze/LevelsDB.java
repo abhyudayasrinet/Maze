@@ -141,6 +141,7 @@ public class LevelsDB extends SQLiteOpenHelper{
 		
         String myPath = DB_PATH + DB_NAME;
         mDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
+        //mDataBase = this.getWritableDatabase();
     }
 	
 	

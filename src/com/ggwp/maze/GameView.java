@@ -109,18 +109,22 @@ public class GameView extends View {
 		mazeX = new int[rows][columns];
 		mazeY = new int[rows][columns];
 		mazeColor = new boolean[rows][columns];
-		Log.d("rowsxcolumns",rows+"x"+columns);
-		mazeGenerator = new MazeGenerator(rows,columns);
 		
-		//mazeGenerator.create_maze(0, 0,0);
-		mazeGenerator.creatMaze();
-//		if(cell_size<60)
-//			mazeGenerator.openWalls(cell_size);
+//		Log.d("rowsxcolumns",rows+"x"+columns);
+		
+		mazeGenerator = new MazeGenerator(rows,columns);
+		//mazeGenerator.createMaze();
+		//mazeGenerator.createMazePrims();
+		mazeGenerator.createMazeKruskals();
+		mazeGenerator.getDestinationPoints();
 		createMazeCoordinates();
 		
 		
 		moveCount = (int) Math.min(mazeGenerator.max_distance+(0.1*mazeGenerator.max_distance),rows*columns);
+		
+		
 		moves.setText("Moves Left : "+moveCount);
+		
 		detector = new ScaleGestureDetector(context, new ScaleListener());
 		
 	}
@@ -278,7 +282,7 @@ public class GameView extends View {
 			//This event fires when all fingers are off the screen
 			mode = NONE;
 			longPressed = false;
-			Log.d("longPressed","false");
+			//Log.d("longPressed","false");
 			dragged = false;
 			screenTouched = false;
 			longPressHandler.removeCallbacks(longPressRunnable);
@@ -328,12 +332,15 @@ public class GameView extends View {
 						
 						//update move count
 						moveCount--;
-						moves.setText("Moves Made : "+moveCount);
+						moves.setText("Moves Left : "+moveCount);
+						
+						
 						
 						//call game over if touched cell is the destination
 						if(row_number == mazeGenerator.dest_row && column_number == mazeGenerator.dest_col)
-							gameOver();
-						
+							gameOver(0);
+						else if(moveCount == 0)
+							gameOver(1);
 				}
 			}
 		}
@@ -351,22 +358,39 @@ public class GameView extends View {
 
 	//user has reached the final cell
 	//game over
-	private void gameOver() {
+	private void gameOver(int flag) {
 		
 		AlertDialog.Builder builder = new Builder(context);
-		builder.setTitle("SUCCESS").setMessage("Well Done!!\nTime Taken : "+timeTaken );
-		builder.setPositiveButton("GO BACK", new DialogInterface.OnClickListener() {
+		
+		if(flag == 0) {
+			builder.setTitle("SUCCESS").setMessage("Well Done!!\nTime Taken : "+timeTaken );
+			builder.setPositiveButton("GO BACK", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					
+					Activity activity = (Activity)getContext();
+					activity.finish();
+					
+				}
+			});
+		}
+		else if(flag == 1) {
+			builder.setTitle("FAIL").setMessage("You Lose!\nTime Taken : "+timeTaken );
+			builder.setPositiveButton("GO BACK", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					
+					Activity activity = (Activity)getContext();
+					activity.finish();
+					
+				}
+			});
 			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				
-				Activity activity = (Activity)getContext();
-				activity.finish();
-				
-			}
-		});
+		}
 		AlertDialog dialog = builder.create();
-		dialog.setCancelable(true);
+		dialog.setCancelable(false);
 		dialog.show();
 		
 		
