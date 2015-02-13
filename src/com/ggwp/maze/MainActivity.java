@@ -5,9 +5,13 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -19,6 +23,9 @@ import com.google.android.gms.ads.AdView;
 
 public class MainActivity extends Activity {
 
+	
+	LevelsDB DB;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -26,12 +33,12 @@ public class MainActivity extends Activity {
 		
 		setContentView(R.layout.activity_main);
 		
-		LevelsDB DB = new LevelsDB(getApplicationContext());
+		DB = new LevelsDB(getApplicationContext());
 		
 		try {
 			DB.createDataBase();
+//			Log.d("db created","done");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -55,24 +62,29 @@ public class MainActivity extends Activity {
     					switch(which) {
     					
     					case 0: //sandbox
-    						intent.putExtra("cell_size", 100);
+    						intent.putExtra("level", 1);
+    						intent.putExtra("mode", 0);
     						startActivity(intent);
     						break;
     						
     					case 1://normal
-    						intent.putExtra("cell_size", 60);
+    						intent.putExtra("level", 2);
+    						intent.putExtra("mode", 0);
     						startActivity(intent);
     						break;	
     					case 2://hard
-    						intent.putExtra("cell_size", 40);
+    						intent.putExtra("level", 3);
+    						intent.putExtra("mode", 0);
     						startActivity(intent);
     						break;	
     					case 3://insane
-    						intent.putExtra("cell_size", 20);
+    						intent.putExtra("level", 4);
+    						intent.putExtra("mode", 0);
     						startActivity(intent);
     						break;	
     					case 4://impossible
-    						intent.putExtra("cell_size", 10);
+    						intent.putExtra("level", 5);
+    						intent.putExtra("mode", 0);
     						startActivity(intent);
     						break;
     					}
@@ -104,7 +116,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
-				Intent intent = new Intent(getApplicationContext(),RecordsList.class);
+				Intent intent = new Intent(getApplicationContext(),RecordsTabFragmentActivity.class);
 				startActivity(intent);
 				
 			}
@@ -128,6 +140,60 @@ public class MainActivity extends Activity {
 		AdRequest adRequest = new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
 		
-	}
+		final SharedPreferences mPreferences = getSharedPreferences("mazePrefs", Activity.MODE_PRIVATE);
+		final int rateAppCounter = mPreferences.getInt("rateAppCounter", 1);
 		
+		if(rateAppCounter != -1 && rateAppCounter%10 == 0) {
+			
+			AlertDialog.Builder rateAppBuilder = new Builder(getApplicationContext());
+			builder.setTitle("RATE US").setMessage("Had fun? Would you like to rate the app?");
+			builder.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
+	
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					
+					SharedPreferences.Editor editor = mPreferences.edit();
+					editor.putInt("rateAppCounter", -1);
+					editor.commit();
+					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.ggwp.maze")));
+					 
+				}
+			});
+			builder.setNeutralButton("Later", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					SharedPreferences.Editor editor = mPreferences.edit();
+					editor.putInt("rateAppCounter", rateAppCounter+1);
+					editor.commit();
+				}
+			});
+			builder.setNegativeButton("Never", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+				
+					SharedPreferences.Editor editor = mPreferences.edit();
+					editor.putInt("rateAppCounter", -1);
+					editor.commit();
+					
+				}
+			});
+			
+			AlertDialog dialog = builder.create();
+			dialog.setCancelable(false);
+			dialog.show();
+			
+		}
+		else if(rateAppCounter != -1){
+			SharedPreferences.Editor editor = mPreferences.edit();
+			editor.putInt("rateAppCounter", rateAppCounter+1);
+			editor.commit();
+		}
+		
+//		Log.d("rateAppCounter",rateAppCounter+"");
+		
+		
+	}
+	
 }

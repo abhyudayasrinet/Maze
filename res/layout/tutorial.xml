@@ -88,21 +88,32 @@
 	        android:layout_gravity="center"
 	        android:gravity="center"
 	        android:padding="5dp"
-	        android:text="Remember you have only limited moves to make"
+	        android:text="Remember you have only limited moves to make and limited time"
 	        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 	    <ImageView
 	        android:id="@+id/imageView5"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:padding = "8dp"
 	        android:layout_gravity="center"
 	        android:gravity="center"
 	        android:src="@drawable/moves_made" />
+	    
+	    <ImageView
+	        android:id="@+id/imageView7"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:padding = "8dp"
+	        android:layout_gravity="center"
+	        android:gravity="center"
+	        android:src="@drawable/time_left" />
 
 	    <ImageView
 	        android:id="@+id/imageView6"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:padding = "8dp"
 	        android:layout_gravity="center"
 	        android:gravity="center"
 	        android:src="@drawable/success" />

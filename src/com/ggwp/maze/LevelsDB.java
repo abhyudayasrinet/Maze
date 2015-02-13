@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,11 +15,11 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 public class LevelsDB extends SQLiteOpenHelper{
 
-	
 	
 	//destination path (location) of our database on device
 	private static String DB_PATH = ""; 
@@ -48,6 +49,13 @@ public class LevelsDB extends SQLiteOpenHelper{
 	String wall2 = "WALL2";
 	String wall3 = "WALL3";
 	
+	//QUICKGAME STATS
+	String quickGameTable = "QUICKGAMESTATS";
+//	String level = "LEVEL";
+	String totalWins = "WINS";
+	String gamesPlayed = "GAMESPLAYED";
+	String totalLoses = "LOSES";
+	String fastestWin = "FASTESTTIME";
 	
 	
 	public LevelsDB(Context context) {
@@ -66,31 +74,40 @@ public class LevelsDB extends SQLiteOpenHelper{
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		/*
-		String createTable = "CREATE TABLE "+levelsTable+"( "+level+" integer,"+completed+" integer ,"+
-									timeTaken+" TEXT ,"+movesTaken+" integer ,"+rows+" integer ,"+
-									columns+" integer,"+destRow+" integer,"+
-									destCol+" integer,"+maxDistance+" integer)";
-		db.execSQL(createTable);
 		
-		createTable = "CREATE TABLE "+coordinatesTable+"( "+level+" integer,"+row+" integer ,"+
-				column+" integer,"+wall0+" integer,"+wall1+" integer,"+wall2+" integer,"
-				+wall3+" integer)";
+	
+//		
+//			String createTable = "CREATE TABLE "+levelsTable+"( "+level+" integer,"+completed+" integer ,"+
+//										timeTaken+" TEXT ,"+movesTaken+" integer ,"+rows+" integer ,"+
+//										columns+" integer,"+destRow+" integer,"+
+//										destCol+" integer,"+maxDistance+" integer)";
+//			db.execSQL(createTable);
+//			
+//			createTable = "CREATE TABLE "+coordinatesTable+"( "+level+" integer,"+row+" integer ,"+
+//					column+" integer,"+wall0+" integer,"+wall1+" integer,"+wall2+" integer,"
+//					+wall3+" integer)";
+//			
+//			db.execSQL(createTable);
+//			
+//			createTable = "CREATE TABLE "+quickGameTable+"( "+level+" integer,"+totalWins+" integer ,"
+//					+gamesPlayed+" integer,"+totalLoses+" integer,"+fastestWin+" text)";
+//			
+//			db.execSQL(createTable);
+//	
 		
-		db.execSQL(createTable);
-		*/
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		
-	//	db.execSQL("DROP TABLE IF EXISTS "+levelsTable);
+		//db.execSQL("DROP TABLE IF EXISTS "+levelsTable);
 		
 	}
 
 	//creates the database if it doesn't already exists by copying from assets folder
 	public void createDataBase() throws IOException {
 
+//		Log.d("createdatabase","started");
 		//If database not exists copy it from the assets
 	    boolean mDataBaseExist = checkDataBase();
 	    if(!mDataBaseExist) {
@@ -107,19 +124,22 @@ public class LevelsDB extends SQLiteOpenHelper{
 	            throw new Error("ErrorCopyingDataBase");
 	        }
 	    }
+//	    Log.d("createdatabase","done");
 	}
 	
 	//check if file exists
 	private boolean checkDataBase() {
         
 		File dbFile = new File(DB_PATH + DB_NAME);
+//		Log.d("Path",DB_PATH+DB_NAME);
+//		Log.d("checkdatabase",dbFile.exists()+"");
         return dbFile.exists();
     }
 	
 	
 	//copy file from assets
 	private void copyDataBase() throws IOException {
-		
+//		Log.d("copydatabase","started");
         InputStream mInput = mContext.getAssets().open(DB_NAME);
         String outFileName = DB_PATH + DB_NAME;
         OutputStream mOutput = new FileOutputStream(outFileName);
@@ -134,14 +154,17 @@ public class LevelsDB extends SQLiteOpenHelper{
         mOutput.flush();
         mOutput.close();
         mInput.close();
+//        Log.d("copydatabase","done");
     }
 	
 	//open writable object
 	public void openDataBase() throws SQLException{
 		
         String myPath = DB_PATH + DB_NAME;
-        mDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
-        //mDataBase = this.getWritableDatabase();
+
+        	mDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
+
+//        	mDataBase = this.getWritableDatabase();
     }
 	
 	
@@ -161,6 +184,7 @@ public class LevelsDB extends SQLiteOpenHelper{
 	//adds a level to the maze
 	//no use for user
 	void addLevel(MazeGenerator maze,int level) {
+		
 		
 		ContentValues values = new ContentValues();
 		
@@ -211,7 +235,6 @@ public class LevelsDB extends SQLiteOpenHelper{
 			}
 		}
 		
-
 	}
 	
 	//marks the level as completed
@@ -264,11 +287,121 @@ public class LevelsDB extends SQLiteOpenHelper{
 	
 	}
 	
+	/*
+	 * update quick game stats for given level
+	 * requires result of game
+	 * lvl - difficulty level
+	 * 0 - loss
+	 * 1 - win
+	 * time - time for completion if won
+	 */
+	void updateQuickGameStats(int lvl,int result,String time) {
+		
+		String query = "SELECT * FROM "+quickGameTable+" where "+this.level+"="+String.valueOf(lvl);
+		Cursor cursor = mDataBase.rawQuery(query,null);
+		
+		int totalWins_ = 0 , gamesPlayed_ = 0, totalLoses_ = 0;
+		String fastestWin_ = "";
+		
+		if(cursor.getCount() == 0) {
+			
+			ContentValues values = new ContentValues();
+			
+			values.put(level, lvl);
+			values.put(totalWins, totalWins_);
+			values.put(gamesPlayed, gamesPlayed_);
+			values.put(totalLoses, totalLoses_);
+			values.put(fastestWin, fastestWin_);
+			
+			mDataBase.insert(quickGameTable, null, values);
+//			Log.d("force updated","true");
+			cursor = mDataBase.rawQuery(query, null);
+		}
+		
+		if(cursor.moveToFirst()) {
+			
+			
+			totalWins_ = cursor.getInt(1);
+			gamesPlayed_ = cursor.getInt(2);
+			totalLoses_ = cursor.getInt(3);
+			fastestWin_ = cursor.getString(4);
+		}
+		
+		gamesPlayed_ += 1;
+		
+		if(result == 1)
+			totalWins_ += 1;
+		else
+			totalLoses_ += 1;
+		
+		if( (time.compareTo(fastestWin_) < 0 || fastestWin_.equals("") ) && result == 1)
+			fastestWin_ = time;
+		
+//		Log.d("updating stats",lvl+","+gamesPlayed_+","+totalWins_+","+totalLoses_+","+fastestWin_);
+		
+		ContentValues values = new ContentValues();
+		
+		values.put(totalWins, totalWins_);
+		values.put(gamesPlayed, gamesPlayed_);
+		values.put(totalLoses, totalLoses_);
+		values.put(fastestWin, fastestWin_);
+		
+		mDataBase.update(quickGameTable, values, this.level+" = ?", new String []{String.valueOf(lvl)});
+		
+//		Log.d("quickgamestats","updated");
+	}
+	
+	 
+	GameStats getQuickGameStats(int lvl) {
+		
+		
+		
+		String query = "SELECT * FROM "+quickGameTable + " where "+level+"="+lvl;
+		Cursor cursor = mDataBase.rawQuery(query, null);
+		
+		int totalWins_ = 0 , gamesPlayed_ = 0, totalLoses_ = 0;
+		String fastestWin_ = "";
+		
+		
+		if(cursor.getCount() == 0) {
+			
+			ContentValues values = new ContentValues();
+			
+			values.put(level, lvl);
+			values.put(totalWins, totalWins_);
+			values.put(gamesPlayed, gamesPlayed_);
+			values.put(totalLoses, totalLoses_);
+			values.put(fastestWin, fastestWin_);
+//			Log.d("force get","true");
+			mDataBase.insert(quickGameTable, null, values);
+			
+			cursor = mDataBase.rawQuery(query, null);
+		}
+		
+//		Log.d("query",query);
+//		Log.d("rows",cursor.getCount()+"");
+		
+		if(cursor.moveToFirst()) {
+			
+			totalWins_ = cursor.getInt(1);
+			gamesPlayed_ = cursor.getInt(2);
+			totalLoses_ = cursor.getInt(3);
+			fastestWin_ = cursor.getString(4);
+			
+		} 
+		
+		GameStats stats = new GameStats(lvl, totalWins_, totalLoses_, gamesPlayed_, fastestWin_);
+
+		return stats;
+		
+	}
+	
 	//returns a mazeGenerator object which contains the maze for a given level
 	MazeGenerator getMaze(int level) { 
 		
 		String query = "SELECT * FROM "+levelsTable+" where "+this.level+"="+String.valueOf(level);
 	    Cursor cursor = mDataBase.rawQuery(query, null);
+//	    Log.d("query results",cursor.getCount()+"");
 	    MazeGenerator maze = new MazeGenerator();
 	    
 	    if (cursor.moveToFirst()) {
@@ -316,7 +449,6 @@ public class LevelsDB extends SQLiteOpenHelper{
 		            
 	        } while (cursor.moveToNext());
 	    }
-	    
 	    return maze;
 	}
 	

@@ -53,11 +53,11 @@ public class LevelsListAdapter extends ArrayAdapter<String>{
         DB.openDataBase();
 		if(DB.checkCompletion(Integer.parseInt(holder.tv.getText().toString())))
 		{
-			Log.d("Level completed",holder.tv.getText().toString());
+//			Log.d("Level completed",holder.tv.getText().toString());
 			holder.tv.setBackgroundColor(Color.GREEN);
 		}
 		else {
-			Log.d("Level not completed",holder.tv.getText().toString());
+//			Log.d("Level not completed",holder.tv.getText().toString());
 			holder.tv.setBackgroundColor(Color.TRANSPARENT);
 		}
 		DB.close();
@@ -68,8 +68,9 @@ public class LevelsListAdapter extends ArrayAdapter<String>{
 			public void onClick(View v) {
 				
 				((Activity)context).finish();
-				Intent intent = new Intent(context, LevelActivity.class);
+				Intent intent = new Intent(context, GameActivity.class);
 				intent.putExtra("level", Integer.parseInt(holder.tv.getText().toString()));
+				intent.putExtra("mode", 1);
 				((Activity)context).startActivity(intent);
 				
 			}
