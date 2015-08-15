@@ -3,7 +3,7 @@ package com.ggwp.maze;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.google.android.gms.internal.db;
+//import com.google.android.gms.internal.db;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -78,10 +78,10 @@ public class GameActivity extends Activity {
         		givenTime = 45;
         	}
         	else if(level >= 11 && level <= 15) {
-        		givenTime = 90;
+        		givenTime = 2*60;
         	}
         	else if(level >= 16 && level <= 20) {
-        		givenTime = 300;
+        		givenTime = 5*60;
         	}
         	else if(level >= 20 && level <= 25) {
         		givenTime = 15*60;
@@ -95,10 +95,10 @@ public class GameActivity extends Activity {
         		givenTime = 45;
         	}
         	else if(level == 3) {
-        		givenTime = 90;
+        		givenTime = 2*60;
         	}
         	else if(level == 4) {
-        		givenTime = 300;
+        		givenTime = 5*60;
         	}
         	else if(level == 5) {
         		givenTime = 15*60;

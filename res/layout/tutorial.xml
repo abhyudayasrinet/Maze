@@ -52,7 +52,7 @@
 	        android:layout_gravity="center"
 	        android:gravity="center"
 	        android:padding="5dp"
-	        android:text="Touch or press and drag your finger over neighbouring green cell to move"
+	        android:text="Touch the edges of the screen to move in that direction"
 	        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 	    <ImageView
@@ -70,7 +70,7 @@
 	        android:layout_gravity="center"
 	        android:gravity="center"
 	        android:padding="5dp"
-	        android:text="Reach the red square and touch it to end the game"
+	        android:text="Reach the red square to end the game"
 	        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 	    <ImageView

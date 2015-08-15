@@ -18,6 +18,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 //import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -43,6 +44,8 @@ public class GameView extends View {
 	TextView moves;
 	LevelsDB DB;
 	int gameMode;
+	int currentX;
+	int currentY;
 	
 	/*
 	 * store x and y coordinates of top left corner
@@ -82,6 +85,7 @@ public class GameView extends View {
 	final Handler longPressHandler;
 	Runnable longPressRunnable;
 	boolean longPressed;
+	boolean GameOver;
 	
 	public GameView(Context context,int height,int width,TextView moves,
 			int level,int mode) {
@@ -102,11 +106,10 @@ public class GameView extends View {
 			}
 		};
 		
-		
+		GameOver = false;
 		DB = new LevelsDB(context);	
 		
 		paint = new Paint();
-		detector = new ScaleGestureDetector(context, new ScaleListener());
 		
 	}
 	
@@ -114,7 +117,7 @@ public class GameView extends View {
 		
 		TextViewHeight += 20;
 		height -= TextViewHeight;
-//		Log.d("textviewheight",TextViewHeight+"");
+	//	Log.d("Height, Width", height + "," + width);
 		intializeValues();
 		
 	}
@@ -176,7 +179,7 @@ public class GameView extends View {
 		
 		createMazeCoordinates();
 		
-		moveCount = (int) Math.min(mazeGenerator.max_distance+(0.05*mazeGenerator.max_distance),(rows*columns)-1);
+		moveCount = (int) Math.min(Math.ceil(mazeGenerator.max_distance+(0.25*mazeGenerator.max_distance)),(rows*columns)-1);
 		maxMoves = moveCount;
 		moves.setText("Moves Left : "+moveCount);
 	}
@@ -202,13 +205,16 @@ public class GameView extends View {
 		}
 		
 		mazeColor[0][0] = true; 
-		
+		currentX = 0;
+		currentY = 0;
 	}
 
 	
 	//Where all the drawing happens
 	@Override
 	protected void onDraw(Canvas canvas) {
+		
+		
 		super.onDraw(canvas);
 		
 		
@@ -274,162 +280,76 @@ public class GameView extends View {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		
+		if(GameOver)
+			return true;
+		
 		switch(event.getAction() & MotionEvent.ACTION_MASK) {
 		
 		case MotionEvent.ACTION_DOWN:
-            //This event happens when the first finger is pressed onto the screen
-			startX = event.getX() - previousTranslateX;
-			startY = event.getY() - previousTranslateY;
-			screenTouched = true;
-			markCell(event.getX(),event.getY()); 
-			if(!longPressed)
-				longPressHandler.postDelayed(longPressRunnable, 500);
-            break;
-		
+			float distFromTop = event.getY();
+			float distFromBot = height - event.getY();
+			float distFromLeft = event.getX();
+			float distFromRight = width - event.getX();
 			
-		case MotionEvent.ACTION_MOVE:
-			//This event fires when the finger moves across the screen, although in practice I've noticed that
-            //this fires even when you're simply holding the finger on the screen.
-			mode = DRAG;
+//			Log.d("distFromTop" , distFromTop+"");
+//			Log.d("distFromLeft" , distFromLeft+"");
+//			Log.d("distFromRight" , distFromRight+"");
+//			Log.d("distFromBot" , distFromBot+"");
 			
-			if(longPressed) {
-				markCell(event.getX(),event.getY());
-            	dragged = true;
-            	break;
-			}
+			if(distFromTop ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
+				moveCell(0);
 			
-			translateX = event.getX() - startX;
-			translateY = event.getY() - startY;
+			if(distFromBot ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
+				moveCell(2);
 			
-			//if scaling is at min(zoomed out)
-			//set translateX,Y to 0
-			//infinite panning still occurs when zoomed out updating translate values
-			//and messing up detecting which cells are touched
-			if(scaleFactor == MIN_ZOOM)
-				translateX = translateY = 0f;
+			if(distFromLeft ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
+				moveCell(3);
 			
-			
-			double distance = Math.sqrt(Math.pow(event.getX() - (startX + previousTranslateX), 2) + Math.pow(event.getY() - (startY + previousTranslateY), 2));
-			
-			//if distance of dragging is > 100 only then assume user wants to pan 
-			//else leave it be
-			
-			if(distance > 100) {
-               dragged = true;
-            }    
-            else {
-            	dragged = false;
-            	translateX = previousTranslateX;
-            	translateY = previousTranslateY;
-            }
-            
+			if(distFromRight ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
+				moveCell(1);
 			break;
-			
-		case MotionEvent.ACTION_POINTER_DOWN:
-			//This event fires when a second finger is pressed onto the screen
-			break;
-			
-		case MotionEvent.ACTION_UP:
-			//This event fires when all fingers are off the screen
-			mode = NONE;
-			longPressed = false;
-			//Log.d("longPressed","false");
-			dragged = false;
-			screenTouched = false;
-			longPressHandler.removeCallbacks(longPressRunnable);
-			previousTranslateX = translateX;
-            previousTranslateY = translateY;
-            
-			break;
-			
-		case MotionEvent.ACTION_POINTER_UP:
-			//This event fires when the second finger is off the screen, but the first finger is still on the
-            //screen
-			mode = DRAG;
-			previousTranslateX = translateX;
-            previousTranslateY = translateY;
-			break;
-			
 		}
 		
-		detector.onTouchEvent(event);
-		
-		if ( (mode == DRAG && scaleFactor != 1f && dragged) || screenTouched) { 
-//			Log.d("invalidate","started");
-			invalidate();
-//			Log.d("invalidate","done");
-		}
 		return true;
+		
 	}
 	
-	//colors the cell touched if any of it's neighbour has been reached
-	private void markCell(float x, float y) {
-
-		x = x/scaleFactor + Math.abs(translateX/scaleFactor);
-		y = y/scaleFactor + Math.abs(translateY/scaleFactor);
-		int row_number = -1,column_number = -1,prev_row_number = 0,prev_column_number = 0;
-		for(int i=0;i<rows;i++) {
-			
-			for(int j=0;j<columns;j++) {
-				
-				//check if touched location lies within current cell
-				//and if any of the neighbour is visited 
-				if(x > mazeX[i][j] && x < mazeX[i][j]+cellSize &&
-					y > mazeY[i][j] && y < mazeY[i][j]+cellSize && neighbourVisited(i,j) &&
-					!mazeColor[i][j]) {
-						
-//						Log.d("touched",i+","+j);
-						row_number = i;
-						column_number = j;
-						
-						prev_row_number = i;
-						prev_column_number = j;
-						
-						if(row_number - 1 >= 0 && mazeColor[row_number-1][column_number]) {
-							prev_column_number = column_number;
-							prev_row_number = row_number - 1;
-						}
-						if(row_number + 1 < rows && mazeColor[row_number+1][column_number]) {
-							prev_column_number = column_number;
-							prev_row_number = row_number + 1;
-						}
-						if(column_number - 1 >=0 && mazeColor[row_number][column_number-1]) {
-							prev_row_number = row_number;
-							prev_column_number = column_number - 1;
-						}
-						if(column_number + 1 < columns && mazeColor[row_number][column_number+1]) {
-							prev_row_number = row_number;	 
-							prev_column_number = column_number + 1;
-						}
-						
-						
-						//update move count
-						moveCount--;
-						moves.setText("Moves Left : "+moveCount);
-						
-						
-						
-						//call game over if touched cell is the destination
-						if(row_number == mazeGenerator.dest_row && column_number == mazeGenerator.dest_col)
-							gameOver(0);
-						else if(moveCount == 0)
-							gameOver(1);
-				}
-			}
+	private void moveCell(int direction)
+	{
+		//Log.d("direction",direction+"");
+		if(direction == 3 && currentY - 1 >= 0 && !mazeGenerator.walls[currentX][currentY][3]) {
+			//Log.d("3","true");
+			mazeColor[currentX][currentY] = false;
+			currentY = currentY - 1;
+			mazeColor[currentX][currentY] = true;
+			moveCount--;
 		}
-		
-		//if touch location wasn't within the maze
-		//do nothing
-		if(row_number == -1 || column_number == -1)
-			return;
-		
-//		Log.d("row,col",row_number+","+column_number);
-//		Log.d("prev row,col",prev_row_number+","+prev_column_number);
-		//mark the cell visited
-		mazeColor[row_number][column_number] = true;
-		mazeColor[prev_row_number][prev_column_number] = false;
+		else if(direction == 1 && currentY + 1 < columns && !mazeGenerator.walls[currentX][currentY][1]) {
+		//	Log.d("1","true");
+			mazeColor[currentX][currentY] = false;
+			currentY = currentY + 1;
+			mazeColor[currentX][currentY] = true;
+			moveCount--;
+		}
+		else if(direction == 0 && currentX - 1 >=0 && !mazeGenerator.walls[currentX][currentY][0]) {
+			//Log.d("0","true");
+			mazeColor[currentX][currentY] = false;
+			currentX = currentX - 1;
+			mazeColor[currentX][currentY] = true;
+			moveCount--;
+		}
+		else if(direction == 2 && currentX + 1 < rows && !mazeGenerator.walls[currentX][currentY][2]) {
+			//Log.d("2","true");
+			mazeColor[currentX][currentY] = false;
+			currentX = currentX + 1;
+			mazeColor[currentX][currentY] = true;
+			moveCount--;
+		}
+		if(currentX == mazeGenerator.dest_row && currentY == mazeGenerator.dest_col)
+			gameOver(0);
+		else if(moveCount == 0)
+			gameOver(1);
 		invalidate();
-		
 	}
 
 	//user has reached the final cell
@@ -439,6 +359,7 @@ public class GameView extends View {
 		AlertDialog.Builder builder = new Builder(context);
 		
 		((GameActivity) getContext()).stopTimer = true;
+		GameOver = true;
 		
 		if(flag == 0) {
 			builder.setTitle("SUCCESS").setMessage("Well Done!!\nTime Taken : "+timeTaken );
@@ -511,39 +432,7 @@ public class GameView extends View {
 		
 		
 		
-	}
-
-	//checks if any of the cell's neighbours is visited
-	private boolean neighbourVisited(int row, int col) {
-		
-		boolean val = false;
-		if( row - 1 >= 0 && !mazeGenerator.walls[row-1][col][2])
-			val = val | mazeColor[row-1][col];
-		if( row + 1 < rows && !mazeGenerator.walls[row+1][col][0])
-			val = val | mazeColor[row+1][col];
-		if( col - 1 >= 0 && !mazeGenerator.walls[row][col-1][1])
-			val = val | mazeColor[row][col-1];
-		if(col + 1 < columns && !mazeGenerator.walls[row][col+1][3])
-			val = val | mazeColor[row][col+1];
-		return val;
-	}
-
-	private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-		
-		@Override
-		public boolean onScale(ScaleGestureDetector detector) {
-			scaleFactor *= detector.getScaleFactor();
-            scaleFactor = Math.max(MIN_ZOOM, Math.min(scaleFactor, MAX_ZOOM));
-            if(scaleFactor == MIN_ZOOM)
-            	translateX = translateY = 0f;
-            
-            invalidate();
-            return true;
-		}
-		
-	}
-	
-	
+	}	
 	
 
 }

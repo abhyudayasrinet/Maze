@@ -5,18 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-import android.widget.Toast;
 
 public class LevelsDB extends SQLiteOpenHelper{
 
@@ -104,6 +99,7 @@ public class LevelsDB extends SQLiteOpenHelper{
 		
 	}
 
+	
 	//creates the database if it doesn't already exists by copying from assets folder
 	public void createDataBase() throws IOException {
 
@@ -462,4 +458,6 @@ public class LevelsDB extends SQLiteOpenHelper{
 	    
 	    return cursor.getCount();
 	}
+
+	
 }

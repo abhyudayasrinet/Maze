@@ -29,8 +29,7 @@ public class RecordsTabFragmentActivity extends FragmentActivity {
             RecordsQuickGameFragment.class, null);
         mTabHost.addTab(mTabHost.newTabSpec("NormalGame").setIndicator("Normal Game"),
             RecordsLevelsFragment.class, null);
-        
-		
+        		
     }
 		
 	

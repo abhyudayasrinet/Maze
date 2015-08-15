@@ -25,7 +25,8 @@ public class MainActivity extends Activity {
 
 	
 	LevelsDB DB;
-	
+	final static int DB_VERSION = 1;
+	final static String DB_NAME = "mazeDB";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,7 +34,22 @@ public class MainActivity extends Activity {
 		
 		setContentView(R.layout.activity_main);
 		
+		
 		DB = new LevelsDB(getApplicationContext());
+		
+		//TODO
+		//remove this
+		//--------------
+		SharedPreferences prefs = getSharedPreferences("mazePrefs", Activity.MODE_PRIVATE);
+		int dbVersion = prefs.getInt("dbVersion", 0);
+		
+		if(dbVersion < DB_VERSION) {
+			getApplicationContext().deleteDatabase(DB_NAME);
+			SharedPreferences.Editor editor = prefs.edit();
+			editor.putInt("dbVersion", DB_VERSION);
+			editor.commit();
+		}
+		//--------------
 		
 		try {
 			DB.createDataBase();
@@ -43,7 +59,7 @@ public class MainActivity extends Activity {
 		}
 		
 		Button quickGame = (Button) findViewById(R.id.quickGame);
-		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		final AlertDialog.Builder quickGameBuilder = new AlertDialog.Builder(this);
 		
         quickGame.setOnClickListener(new OnClickListener() {
 			
@@ -51,7 +67,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				
 				
-				builder.setTitle("Choose Difficulty")
+				quickGameBuilder.setTitle("Choose Difficulty")
     			.setItems(R.array.difficulty_options, new DialogInterface.OnClickListener() {
                 
     				public void onClick(DialogInterface dialog, int which) {
@@ -91,7 +107,7 @@ public class MainActivity extends Activity {
     				}
     			});
 				
-				AlertDialog dialog = builder.create();
+				AlertDialog dialog = quickGameBuilder.create();
     			dialog.setCancelable(true);
     			dialog.show();
 				
@@ -143,11 +159,14 @@ public class MainActivity extends Activity {
 		final SharedPreferences mPreferences = getSharedPreferences("mazePrefs", Activity.MODE_PRIVATE);
 		final int rateAppCounter = mPreferences.getInt("rateAppCounter", 1);
 		
+		AlertDialog.Builder rateAppBuilder = new Builder(MainActivity.this);
+		
 		if(rateAppCounter != -1 && rateAppCounter%10 == 0) {
 			
-			AlertDialog.Builder rateAppBuilder = new Builder(getApplicationContext());
-			builder.setTitle("RATE US").setMessage("Had fun? Would you like to rate the app?");
-			builder.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
+			
+			
+			rateAppBuilder.setTitle("RATE US").setMessage("Had fun? Would you like to rate the app?");
+			rateAppBuilder.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
 	
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -159,7 +178,7 @@ public class MainActivity extends Activity {
 					 
 				}
 			});
-			builder.setNeutralButton("Later", new DialogInterface.OnClickListener() {
+			rateAppBuilder.setNeutralButton("Later", new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -168,7 +187,7 @@ public class MainActivity extends Activity {
 					editor.commit();
 				}
 			});
-			builder.setNegativeButton("Never", new DialogInterface.OnClickListener() {
+			rateAppBuilder.setNegativeButton("Never", new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -180,8 +199,8 @@ public class MainActivity extends Activity {
 				}
 			});
 			
-			AlertDialog dialog = builder.create();
-			dialog.setCancelable(false);
+			AlertDialog dialog = rateAppBuilder.create();
+			dialog.setCancelable(true);
 			dialog.show();
 			
 		}
