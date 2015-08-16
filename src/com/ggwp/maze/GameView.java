@@ -345,10 +345,12 @@ public class GameView extends View {
 			mazeColor[currentX][currentY] = true;
 			moveCount--;
 		}
+		moves.setText("Moves Left : "+moveCount);
 		if(currentX == mazeGenerator.dest_row && currentY == mazeGenerator.dest_col)
 			gameOver(0);
 		else if(moveCount == 0)
 			gameOver(1);
+		
 		invalidate();
 	}
 
