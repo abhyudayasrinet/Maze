@@ -350,8 +350,6 @@ public class LevelsDB extends SQLiteOpenHelper{
 	 
 	GameStats getQuickGameStats(int lvl) {
 		
-		
-		
 		String query = "SELECT * FROM "+quickGameTable + " where "+level+"="+lvl;
 		Cursor cursor = mDataBase.rawQuery(query, null);
 		
@@ -368,7 +366,6 @@ public class LevelsDB extends SQLiteOpenHelper{
 			values.put(gamesPlayed, gamesPlayed_);
 			values.put(totalLoses, totalLoses_);
 			values.put(fastestWin, fastestWin_);
-//			Log.d("force get","true");
 			mDataBase.insert(quickGameTable, null, values);
 			
 			cursor = mDataBase.rawQuery(query, null);

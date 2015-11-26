@@ -247,7 +247,7 @@ public class GameView extends View {
 				
 				//if cell has been touched color it green
 				if(mazeColor[i][j]) {
-					paint.setColor(Color.GREEN);
+					paint.setColor(Color.parseColor("#006400"));
 					paint.setStyle(Paint.Style.FILL);
 					canvas.drawRect(mazeX[i][j], mazeY[i][j], mazeX[i][j]+cellSize, mazeY[i][j]+cellSize, paint);
 				}
@@ -297,16 +297,28 @@ public class GameView extends View {
 //			Log.d("distFromBot" , distFromBot+"");
 			
 			if(distFromTop ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
+			{
+//				Log.d("Top chosen","Top chosen");
 				moveCell(0);
+			}
 			
 			if(distFromBot ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
+			{
+//				Log.d("Bot chosen","Bot chosen");
 				moveCell(2);
+			}
 			
 			if(distFromLeft ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
-				moveCell(3);
+			{
+//					Log.d("Left chosen","Left chosen");
+					moveCell(3);
+			}
 			
 			if(distFromRight ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
+			{
+//				Log.d("Right chosen","Right chosen");
 				moveCell(1);
+			}
 			break;
 		}
 		
@@ -314,7 +326,7 @@ public class GameView extends View {
 		
 	}
 	
-	private void moveCell(int direction)
+	public void moveCell(int direction)
 	{
 		//Log.d("direction",direction+"");
 		if(direction == 3 && currentY - 1 >= 0 && !mazeGenerator.walls[currentX][currentY][3]) {

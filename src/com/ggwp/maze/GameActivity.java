@@ -39,7 +39,6 @@ public class GameActivity extends Activity {
 	int timeLeft;
 	boolean stopTimer;
 	
-	
 	int levelCounter = 0;
 	
 	LinearLayout mainLayout,topMenu;
@@ -141,7 +140,15 @@ public class GameActivity extends Activity {
         moves.setText("Moves Made : 0");
         topMenu.addView(moves);
         
-        final GameView view = new GameView(this, height, width,moves,level,mode);
+        final GameView gameView = new GameView(this, height, width,moves,level,mode);
+        
+        topMenu.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				gameView.moveCell(0);
+			}
+		});
         
         //timer to update the timer
         timer = new Timer();
@@ -184,13 +191,13 @@ public class GameActivity extends Activity {
 		                	mm = String.valueOf(timeCounterMins);
 		                	hh = String.valueOf(timeCounterHours);
 		                	
-		                    view.timeTaken = hh+":"+mm+":"+ss;
+		                    gameView.timeTaken = hh+":"+mm+":"+ss;
 		                    
 		                    
 		                    
 		                    if(timeLeft == 0) {
 		                    	
-		                    	view.gameOver(1);
+		                    	gameView.gameOver(1);
 		                    }
 	                	}
 	                }
@@ -199,7 +206,7 @@ public class GameActivity extends Activity {
 			}
 		},100,1000);
         
-        mainLayout.addView(view);
+        mainLayout.addView(gameView);
         setContentView(mainLayout);
         
         
@@ -210,7 +217,7 @@ public class GameActivity extends Activity {
             public void onGlobalLayout() {
                 ViewGroup.MarginLayoutParams vlp = (MarginLayoutParams) tv.getLayoutParams();
                 int btnsize =tv.getMeasuredHeight()+vlp.topMargin;
-                view.setDimensions(btnsize);
+                gameView.setDimensions(btnsize);
                 ViewTreeObserver obs = tv.getViewTreeObserver();
                 obs.removeGlobalOnLayoutListener(this);
             }
