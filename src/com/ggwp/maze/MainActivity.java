@@ -114,6 +114,63 @@ public class MainActivity extends Activity {
 			}
 		});
         
+        
+        Button practiceGame = (Button) findViewById(R.id.practiceGame);
+		final AlertDialog.Builder practiceGameBuilder = new AlertDialog.Builder(this);
+		
+        practiceGame.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				
+				practiceGameBuilder.setTitle("Choose Difficulty")
+    			.setItems(R.array.difficulty_options, new DialogInterface.OnClickListener() {
+                
+    				public void onClick(DialogInterface dialog, int which) {
+    					
+    					//finish();
+    					Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+
+    					switch(which) {
+    					
+    					case 0: //sandbox
+    						intent.putExtra("level", 1);
+    						intent.putExtra("mode", -1);
+    						startActivity(intent);
+    						break;
+    						
+    					case 1://normal
+    						intent.putExtra("level", 2);
+    						intent.putExtra("mode", -1);
+    						startActivity(intent);
+    						break;	
+    					case 2://hard
+    						intent.putExtra("level", 3);
+    						intent.putExtra("mode", -1);
+    						startActivity(intent);
+    						break;	
+    					case 3://insane
+    						intent.putExtra("level", 4);
+    						intent.putExtra("mode", -1);
+    						startActivity(intent);
+    						break;	
+    					case 4://impossible
+    						intent.putExtra("level", 5);
+    						intent.putExtra("mode", -1);
+    						startActivity(intent);
+    						break;
+    					}
+    				}
+    			});
+				
+				AlertDialog dialog = practiceGameBuilder.create();
+    			dialog.setCancelable(true);
+    			dialog.show();
+				
+			}
+		});
+        
         Button normalGame = (Button) findViewById(R.id.normalGame);
         normalGame.setOnClickListener(new OnClickListener() {
 			
@@ -125,6 +182,8 @@ public class MainActivity extends Activity {
 				
 			}
 		});
+        
+        
         
         Button records = (Button) findViewById(R.id.records);
         records.setOnClickListener(new OnClickListener() {

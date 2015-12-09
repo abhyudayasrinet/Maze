@@ -52,7 +52,7 @@
 	        android:layout_gravity="center"
 	        android:gravity="center"
 	        android:padding="5dp"
-	        android:text="Touch the edges of the screen to move in that direction"
+	        android:text="Click the buttons at the bottom to move in that direction"
 	        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 	    <ImageView
@@ -61,7 +61,7 @@
 	        android:layout_height="wrap_content"
 	        android:layout_gravity="center"
 	        android:gravity="center"
-	        android:src="@drawable/touch_to_move" />
+	        android:src="@drawable/click_to_move" />
 
 	    <TextView
 	        android:id="@+id/textView4"

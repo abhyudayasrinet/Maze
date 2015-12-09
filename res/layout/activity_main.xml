@@ -10,63 +10,6 @@
     android:paddingRight="8dp">
     
 
-    <Button
-        android:id="@+id/normalGame"
-        android:layout_width="270dp"
-        android:layout_height="60dp"
-        android:layout_below="@+id/quickGame"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
-        android:background="@drawable/buttonshape"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:text="NORMAL"
-        android:textColor="#000000"
-        android:textSize="20sp"/>
-
-    <Button
-        android:id="@+id/records"
-        android:layout_below="@+id/normalGame"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
-        android:layout_width="270dp"
-        android:layout_height="60dp"
-        android:background="@drawable/buttonshape"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:text="RECORDS"
-        android:textColor="#000000"
-        android:textSize="20sp" />
-    
-    <com.google.android.gms.ads.AdView
-	        android:id="@+id/adViewMainMenu"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_centerHorizontal="true"
-	        android:layout_alignParentBottom="true"
-	        ads:adSize="BANNER"
-	        ads:adUnitId="ca-app-pub-4192002242677873/9916085340" />
-
-    <Button
-        android:id="@+id/quickGame"
-        android:layout_width="270dp"
-        android:layout_height="60dp"
-        android:layout_alignLeft="@+id/normalGame"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="63dp"
-        android:background="@drawable/buttonshape"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:text="QUICK GAME"
-        android:textColor="#000000"
-        android:textSize="20sp" />
-
     <ImageButton
         android:id="@+id/help"
         android:layout_alignParentRight="true"
@@ -80,6 +23,83 @@
         android:shadowRadius="5"
         android:padding="8dp"
         android:src="@android:drawable/ic_menu_help" />
+    
+    <Button
+        android:id="@+id/quickGame"
+        android:layout_width="270dp"
+        android:layout_height="60dp"
+        android:layout_alignLeft="@+id/normalGame"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="QUICK GAME"
+        android:textColor="#000000"
+        android:textSize="20sp" />
+    
+    <Button
+        android:id="@+id/normalGame"
+        android:layout_width="270dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/quickGame"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="NORMAL"
+        android:textColor="#000000"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/records"
+        android:layout_below="@+id/practiceGame"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:layout_width="270dp"
+        android:layout_height="60dp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="RECORDS"
+        android:textColor="#000000"
+        android:textSize="20sp" />
+    
+    <Button
+        android:id="@+id/practiceGame"
+        android:layout_below="@id/normalGame"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:layout_width="270dp"
+        android:layout_height="60dp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="PRACTICE"
+        android:textColor="#000000"
+        android:textSize="20sp" />
+    
+    <com.google.android.gms.ads.AdView
+	        android:id="@+id/adViewMainMenu"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerHorizontal="true"
+	        android:layout_alignParentBottom="true"
+	        ads:adSize="BANNER"
+	        ads:adUnitId="ca-app-pub-4192002242677873/9916085340" />
+
+    
+
+    
 
 
 </RelativeLayout>

@@ -82,9 +82,7 @@ public class GameView extends View {
 	
 	private boolean screenTouched = false;
 	
-	final Handler longPressHandler;
-	Runnable longPressRunnable;
-	boolean longPressed;
+	
 	boolean GameOver;
 	
 	public GameView(Context context,int height,int width,TextView moves,
@@ -97,26 +95,22 @@ public class GameView extends View {
 		this.moves = moves;
 		this.level = level;
 		this.gameMode = mode;
-		longPressHandler = new Handler();
 		
-		longPressRunnable = new Runnable() {
-			@Override
-			public void run() {
-				longPressed = true;
-			}
-		};
-		
+		Log.d("game view mode",""+gameMode);
 		GameOver = false;
 		DB = new LevelsDB(context);	
 		
 		paint = new Paint();
+		
+		if(gameMode==-1)
+			setDimensions(0);
 		
 	}
 	
 	public void setDimensions(int TextViewHeight) {
 		
 		TextViewHeight += 20;
-		height -= TextViewHeight;
+		height -= 2*TextViewHeight;
 	//	Log.d("Height, Width", height + "," + width);
 		intializeValues();
 		
@@ -124,7 +118,7 @@ public class GameView extends View {
 	
 	public void intializeValues() {
 		
-		if(gameMode == 0) {
+		if(gameMode <= 0) { //practice and quickgame
 			
 			if(level == 1) {
 				rows = 10;
@@ -152,7 +146,7 @@ public class GameView extends View {
 			mazeGenerator = new MazeGenerator(rows,columns);
 			mazeGenerator.createMazeKruskals();
 			mazeGenerator.getDestinationPoints();
-			
+			Log.d("maze created","complete");
 			
 		}
 		else if(gameMode == 1) {
@@ -179,9 +173,11 @@ public class GameView extends View {
 		
 		createMazeCoordinates();
 		
+		
 		moveCount = (int) Math.min(Math.ceil(mazeGenerator.max_distance+(0.25*mazeGenerator.max_distance)),(rows*columns)-1);
 		maxMoves = moveCount;
-		moves.setText("Moves Left : "+moveCount);
+		if(gameMode!=-1)
+			moves.setText("Moves Left : "+moveCount);
 	}
 	
 	//assign coordinates of top left corner of each cell
@@ -275,57 +271,7 @@ public class GameView extends View {
 		canvas.restore();
 	}
 	
-	
-	//handles panning and zooming and touch detection to mark cells
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		
-		if(GameOver)
-			return true;
-		
-		switch(event.getAction() & MotionEvent.ACTION_MASK) {
-		
-		case MotionEvent.ACTION_DOWN:
-			float distFromTop = event.getY();
-			float distFromBot = height - event.getY();
-			float distFromLeft = event.getX();
-			float distFromRight = width - event.getX();
-			
-//			Log.d("distFromTop" , distFromTop+"");
-//			Log.d("distFromLeft" , distFromLeft+"");
-//			Log.d("distFromRight" , distFromRight+"");
-//			Log.d("distFromBot" , distFromBot+"");
-			
-			if(distFromTop ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
-			{
-//				Log.d("Top chosen","Top chosen");
-				moveCell(0);
-			}
-			
-			if(distFromBot ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
-			{
-//				Log.d("Bot chosen","Bot chosen");
-				moveCell(2);
-			}
-			
-			if(distFromLeft ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
-			{
-//					Log.d("Left chosen","Left chosen");
-					moveCell(3);
-			}
-			
-			if(distFromRight ==  Math.min(distFromTop, Math.min(distFromBot, Math.min(distFromLeft, distFromRight))) )
-			{
-//				Log.d("Right chosen","Right chosen");
-				moveCell(1);
-			}
-			break;
-		}
-		
-		return true;
-		
-	}
-	
+
 	public void moveCell(int direction)
 	{
 		//Log.d("direction",direction+"");
@@ -334,33 +280,38 @@ public class GameView extends View {
 			mazeColor[currentX][currentY] = false;
 			currentY = currentY - 1;
 			mazeColor[currentX][currentY] = true;
-			moveCount--;
+			if(gameMode!=-1)
+				moveCount--;
 		}
 		else if(direction == 1 && currentY + 1 < columns && !mazeGenerator.walls[currentX][currentY][1]) {
 		//	Log.d("1","true");
 			mazeColor[currentX][currentY] = false;
 			currentY = currentY + 1;
 			mazeColor[currentX][currentY] = true;
-			moveCount--;
+			if(gameMode!=-1)
+				moveCount--;
 		}
 		else if(direction == 0 && currentX - 1 >=0 && !mazeGenerator.walls[currentX][currentY][0]) {
 			//Log.d("0","true");
 			mazeColor[currentX][currentY] = false;
 			currentX = currentX - 1;
 			mazeColor[currentX][currentY] = true;
-			moveCount--;
+			if(gameMode!=-1)
+				moveCount--;
 		}
 		else if(direction == 2 && currentX + 1 < rows && !mazeGenerator.walls[currentX][currentY][2]) {
 			//Log.d("2","true");
 			mazeColor[currentX][currentY] = false;
 			currentX = currentX + 1;
 			mazeColor[currentX][currentY] = true;
-			moveCount--;
+			if(gameMode!=-1)
+				moveCount--;
 		}
-		moves.setText("Moves Left : "+moveCount);
+		if(gameMode!=-1)
+			moves.setText("Moves Left : "+moveCount);
 		if(currentX == mazeGenerator.dest_row && currentY == mazeGenerator.dest_col)
 			gameOver(0);
-		else if(moveCount == 0)
+		else if(moveCount == 0 && gameMode!=-1)
 			gameOver(1);
 		
 		invalidate();
@@ -376,7 +327,10 @@ public class GameView extends View {
 		GameOver = true;
 		
 		if(flag == 0) {
-			builder.setTitle("SUCCESS").setMessage("Well Done!!\nTime Taken : "+timeTaken );
+			if(gameMode==-1)
+				builder.setTitle("SUCCESS").setMessage("Well Done!!");
+			else
+				builder.setTitle("SUCCESS").setMessage("Well Done!!\nTime Taken : "+timeTaken );
 			builder.setPositiveButton("GO BACK", new DialogInterface.OnClickListener() {
 				
 				@Override
@@ -406,6 +360,11 @@ public class GameView extends View {
 						Activity activity = (Activity)getContext();
 						activity.finish();
 						
+					}
+					else if(gameMode == -1) //Practice
+					{
+						Activity activity = (Activity)getContext();
+						activity.finish();
 					}
 					
 				}
